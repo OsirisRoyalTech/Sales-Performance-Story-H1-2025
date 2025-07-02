@@ -1,0 +1,82 @@
+Step-by-step breakdown of the **data cleaning and preparation process** for the fictional company sales dataset.
+
+--------------------------------------------------------------------------------------------------------------------
+
+## 🧹 Data Cleaning & Preparation Steps
+
+### 1. **Data Inspection**
+
+* Loaded the dataset using `pandas.read_csv()`.
+* Verified data shape: `df.shape` to ensure all 1,000 rows were present.
+* Reviewed data types and structure using `df.info()` and `df.head()`.
+
+### 2. **Date Conversion**
+
+* Converted the `Date` column from string to datetime format using:
+
+  ```python
+  df['Date'] = pd.to_datetime(df['Date'])
+  ```
+
+### 3. **Missing Values Check**
+
+* Checked for missing or null values:
+
+  ```python
+  df.isnull().sum()
+  ```
+* No missing values found due to synthetic data control.
+
+### 4. **Data Type Validation**
+
+* Ensured numerical columns (`Units Sold`, `Unit Price ($)`, `Total Revenue ($)`) were correctly set as `int` or `float`.
+* Validated categorical columns (`Region`, `Sales Rep`, `Product`, `Client Type`, `Quarter`) were consistent with expected values using `df['Column'].unique()`.
+
+### 5. **Outlier Detection (Basic)**
+
+* Performed simple checks using `.describe()` to identify unreasonable values (e.g., extremely low/high unit prices or quantities).
+* All values were within expected synthetic ranges.
+
+### 6. **Revenue Validation**
+
+* Verified that `Total Revenue ($)` matched `Units Sold × Unit Price ($)` using:
+
+  ```python
+  df['Revenue_Check'] = df['Units Sold'] * df['Unit Price ($)']
+  assert (df['Revenue_Check'] == df['Total Revenue ($)']).all()
+  df.drop('Revenue_Check', axis=1, inplace=True)
+  ```
+
+### 7. **Quarter Verification**
+
+* Recalculated quarter based on the `Date` column to confirm data consistency:
+
+  ```python
+  df['Calculated_Quarter'] = df['Date'].dt.quarter.apply(lambda x: f"Q{x}")
+  assert (df['Quarter'] == df['Calculated_Quarter']).all()
+  df.drop('Calculated_Quarter', axis=1, inplace=True)
+  ```
+
+### 8. **Column Formatting**
+
+* Renamed columns for consistency (e.g., removed special characters):
+
+  ```python
+  df.columns = df.columns.str.replace(' ', '_').str.replace('(', '').str.replace(')', '').str.lower()
+  ```
+
+### 9. **Export Cleaned Data**
+
+* Saved the cleaned dataset to a new CSV file:
+
+  ```python
+  df.to_csv('company_sales_data_cleaned.csv', index=False)
+  ```
+
+---
+
+## ✅ Final Output
+
+* Cleaned dataset: `company_sales_data_cleaned.csv`
+* 1,000 valid rows, 10 well-structured columns
+* Ready for exploratory analysis, dashboarding, and modeling
